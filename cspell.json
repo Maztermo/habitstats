@@ -1,0 +1,17 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [
+        {
+            "name": "Habitstats Dictionary",
+            "path": "cspell/habitstats_dictionary.txt",
+            "description": "Custom words added for Omega 365",
+            "addWords": true,
+            "scope": "workspace"
+        }
+    ],
+    "dictionaries": [
+        "Habitstats Dictionary"
+    ],
+    "import": []
+}
