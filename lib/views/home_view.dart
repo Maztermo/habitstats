@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitstats/providers/home_page_controller.dart';
+import 'package:habitstats/views/calendar_view.dart';
 import 'package:habitstats/views/create_routine_view.dart';
-import 'package:habitstats/views/page123.dart';
-import 'package:habitstats/widgets/bottom_navigation_bar.dart';
+import 'package:habitstats/views/stats_view.dart';
+import 'package:habitstats/views/upcoming_view.dart';
+import 'package:habitstats/widgets/bottom_nav_bar.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
@@ -28,9 +30,9 @@ class HomeView extends ConsumerWidget {
         onPageChanged: ref.read(homePageControllerProvider.notifier).makeSureNavBarIndexIsUpdated,
         controller: ref.watch(homePageControllerProvider).homePageController,
         children: const [
-          Page1(),
-          Page2(),
-          Page3(),
+          UpcomingView(),
+          CalendarView(),
+          StatsView(),
         ],
       ),
       bottomNavigationBar: const BottomNavBar(),

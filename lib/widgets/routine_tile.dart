@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:habitstats/extensions/date_time_extensions.dart';
 import 'package:habitstats/models/routine.dart';
 
 class RoutineTile extends StatelessWidget {
@@ -32,7 +32,7 @@ class RoutineTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(routine.title ?? 'missing title'),
+        title: Text('${routine.title} - ${routine.startDateTime?.inHowManyDays}'),
         subtitle: Text(routine.description ?? 'missing description'),
         trailing: Icon(
           Icons.circle,

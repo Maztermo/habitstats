@@ -66,8 +66,8 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
     state = state.copyWith(difficulty: flooredDifficulty);
   }
 
-  updateDayFrequency(double difficulty) {
-    final flooredFrequency = difficulty.round();
+  updateDayFrequency(double dayFrequency) {
+    final flooredFrequency = dayFrequency.round();
     state = state.copyWith(dayFrequency: flooredFrequency);
   }
 
@@ -75,12 +75,21 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
     final title = state.titleController.text.trim();
     final description = state.descriptionController.text.trim();
     final difficulty = state.difficulty;
+    final dayFrequency = state.dayFrequency;
+    final startDateTime = state.startDateTime;
 
-    await DataBaseService.instance.createAndSaveRoutine(title, description, difficulty);
+    await DataBaseService.instance.createAndSaveRoutine(
+      title,
+      description,
+      difficulty,
+      dayFrequency,
+      startDateTime,
+    );
+
     await ref.read(routinesController.notifier).updateRoutines();
   }
 
-  Future<void> setStartDateTime(context) async {
+  Future<void> pickStartDateTime(context) async {
     final today = DateTime.now();
     final earliest = today.subtract(const Duration(days: 365));
     final latest = today.add(const Duration(days: 365));

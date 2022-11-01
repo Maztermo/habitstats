@@ -1,11 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesService {
+  static SharedPreferencesService? _sharedPreferenceService;
+  late final SharedPreferences _sharedPreferences;
   final String _userSelectedDarkTheme = 'UserSelectedDarkTheme';
 
-  static SharedPreferencesService? _sharedPreferenceService;
-
-  late final SharedPreferences _sharedPreferences;
+  SharedPreferencesService._();
 
   static SharedPreferencesService get instance {
     if (_sharedPreferenceService == null) {
@@ -13,8 +13,6 @@ class SharedPreferencesService {
     }
     return _sharedPreferenceService!;
   }
-
-  SharedPreferencesService._();
 
   static Future<SharedPreferencesService> ensureInitialized() async {
     _sharedPreferenceService ??= SharedPreferencesService._();

@@ -31,11 +31,13 @@ class DataBaseService {
     return database.routines.where().findAll();
   }
 
-  Future<void> createAndSaveRoutine(title, description, difficulty) async {
+  Future<void> createAndSaveRoutine(title, description, difficulty, dayFrequency, startDateTime) async {
     final newRoutine = Routine()
       ..title = title
       ..description = description
-      ..difficulty = difficulty;
+      ..difficulty = difficulty
+      ..dayFrequency = dayFrequency
+      ..startDateTime = startDateTime;
 
     await database.writeTxn(() async {
       await database.routines.put(newRoutine);
