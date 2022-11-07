@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitstats/extensions/date_time_extensions.dart';
 import 'package:habitstats/models/routine.dart';
+import 'package:habitstats/providers/routines_controller.dart';
 
-class RoutineTile extends StatelessWidget {
+class RoutineTile extends ConsumerWidget {
   final Routine routine;
 
   const RoutineTile({
@@ -29,15 +31,16 @@ class RoutineTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: ListTile(
-        title: Text('${routine.title} - ${routine.startDateTime?.inHowManyDays}'),
-        subtitle: Text(routine.description ?? 'missing description'),
+        title: Text('${routine.title} - ${routine.nextDueDateTime.inHowManyDays}'),
+        subtitle: Text('Done ${routine.routineCompletedDateTimes.length} times - ${routine.description}'),
         trailing: Icon(
           Icons.circle,
           color: setColorByDifficulty(routine.difficulty),
         ),
+        onTap: () => ref.read(routinesController.notifier).completedRoutine(oldRoutine: routine),
       ),
     );
   }

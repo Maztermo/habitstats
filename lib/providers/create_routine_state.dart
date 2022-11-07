@@ -9,13 +9,13 @@ class CreateRoutineState extends Equatable {
   final int? difficulty; // starts as null
   final int? dayFrequency;
   final String selectedCategory;
-  final DateTime? startDateTime; // starts as null
+  final DateTime? nextDueDateTime; // starts as null
   // bools
   final bool titleOk;
   final bool descriptionOk;
   final bool difficultyOk;
   final bool dayFrequencyOk;
-  final bool startDateTimeOk;
+  final bool nextDueDateTimeOk;
   final bool everythingOk;
 
   const CreateRoutineState({
@@ -25,13 +25,13 @@ class CreateRoutineState extends Equatable {
     required this.difficulty,
     required this.dayFrequency,
     required this.selectedCategory,
-    required this.startDateTime,
+    required this.nextDueDateTime,
     // bools
     required this.titleOk,
     required this.descriptionOk,
     required this.difficultyOk,
     required this.dayFrequencyOk,
-    required this.startDateTimeOk,
+    required this.nextDueDateTimeOk,
     required this.everythingOk,
   });
 
@@ -42,13 +42,13 @@ class CreateRoutineState extends Equatable {
     final int? difficulty,
     final int? dayFrequency,
     final String? selectedCategory,
-    final DateTime? startDateTime,
+    final DateTime? nextDueDateTime,
     // bools
     final bool? titleOk,
     final bool? descriptionOk,
     final bool? difficultyOk,
     final bool? dayFrequencyOk,
-    final bool? startDateTimeOk,
+    final bool? nextDueDateTimeOk,
     final bool? everythingOk,
   }) =>
       CreateRoutineState(
@@ -58,13 +58,13 @@ class CreateRoutineState extends Equatable {
         difficulty: difficulty ?? this.difficulty,
         dayFrequency: dayFrequency ?? this.dayFrequency,
         selectedCategory: selectedCategory ?? this.selectedCategory,
-        startDateTime: startDateTime ?? this.startDateTime,
+        nextDueDateTime: nextDueDateTime ?? this.nextDueDateTime,
         // bools
         titleOk: titleOk ?? this.titleOk,
         descriptionOk: descriptionOk ?? this.descriptionOk,
         difficultyOk: difficultyOk ?? this.difficultyOk,
         dayFrequencyOk: dayFrequencyOk ?? this.dayFrequencyOk,
-        startDateTimeOk: startDateTimeOk ?? this.startDateTimeOk,
+        nextDueDateTimeOk: nextDueDateTimeOk ?? this.nextDueDateTimeOk,
         everythingOk: everythingOk ?? this.everythingOk,
       );
 
@@ -76,13 +76,13 @@ class CreateRoutineState extends Equatable {
         difficulty,
         dayFrequency,
         selectedCategory,
-        startDateTime,
+        nextDueDateTime,
         // bools
         titleOk,
         descriptionOk,
         difficultyOk,
         dayFrequencyOk,
-        startDateTimeOk,
+        nextDueDateTimeOk,
         everythingOk,
       ];
 }

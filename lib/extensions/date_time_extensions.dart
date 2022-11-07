@@ -14,10 +14,10 @@ extension DateTimeExtension on DateTime {
 
     if (theSameDay) return 'today';
 
-    final daysLeft = (to.difference(from).inHours / 24).round();
+    final daysLeft = (to.difference(from).inHours / 24).ceil();
 
-    if (daysLeft == 0) return 'tomorrow';
-    if (daysLeft == 1) return 'in $daysLeft day';
+    if (daysLeft == 1) return 'tomorrow';
+
     return 'in $daysLeft days';
   }
 }

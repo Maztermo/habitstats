@@ -28,19 +28,36 @@ class DataBaseService {
   }
 
   Future<List<Routine>> get allRoutines {
-    return database.routines.where().findAll();
+    return database.routines.where().sortByNextDueDateTime().findAll();
   }
 
-  Future<void> createAndSaveRoutine(title, description, difficulty, dayFrequency, startDateTime) async {
+  Future<void> createAndSaveRoutine(title, description, difficulty, dayFrequency, nextDueDateTime) async {
     final newRoutine = Routine()
       ..title = title
       ..description = description
       ..difficulty = difficulty
       ..dayFrequency = dayFrequency
-      ..startDateTime = startDateTime;
+      ..nextDueDateTime = nextDueDateTime
+      ..routineCompletedDateTimes = <DateTime>[];
 
     await database.writeTxn(() async {
       await database.routines.put(newRoutine);
+    });
+  }
+
+  Future<void> updateRoutine({
+    required newRoutine,
+  }) async {
+    await database.writeTxn(() async {
+      await database.routines.put(newRoutine);
+    });
+  }
+
+  Future<void> deleteRoutine({
+    required Routine routine,
+  }) async {
+    await database.writeTxn(() async {
+      await database.routines.delete(routine.id);
     });
   }
 }

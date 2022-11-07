@@ -5,7 +5,8 @@ import 'package:habitstats/widgets/create_routine/custom_text_form_field.dart';
 import 'package:habitstats/widgets/create_routine/day_frequency_slider.dart';
 import 'package:habitstats/widgets/create_routine/difficulty_slider.dart';
 import 'package:habitstats/widgets/create_routine/start_date_picker.dart';
-import 'package:habitstats/widgets/create_routine/valid_or_not_container.dart';
+import 'package:habitstats/widgets/create_routine/validation_container.dart';
+import 'package:habitstats/widgets/flat_action_button.dart';
 
 class CreateRoutineView extends ConsumerStatefulWidget {
   static const routeId = 'create-routine';
@@ -17,21 +18,6 @@ class CreateRoutineView extends ConsumerStatefulWidget {
 }
 
 class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
-  Future<bool> _confirmCancelDraftDialog() async {
-    return await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Draft will be deleted'),
-            content: const Text('Are you sure you want to go back to the homepage without adding the routine?'),
-            actions: [
-              TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Yes, delete and go back')),
-              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('No, continue editing')),
-            ],
-          ),
-        ) ??
-        false;
-  }
-
   @override
   Widget build(BuildContext context) {
     final formKey = ref.watch(createRoutineControllerProvider).formKey;
@@ -42,7 +28,7 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
       appBar: AppBar(title: const Text('Create new routine')),
       body: Form(
         key: formKey,
-        onWillPop: () => _confirmCancelDraftDialog(),
+        onWillPop: () => ref.read(createRoutineControllerProvider.notifier).confirmCancelDraftDialog(context),
         child: GestureDetector(
           onTap: () {
             // Detect tap outside of primaryFocus => dismiss keyboard
@@ -57,31 +43,31 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: [
-                  ValidOrNotContainer(
+                  ValidationContainer(
                     title: 'Title',
                     isValid: ref.watch(createRoutineControllerProvider).titleController.text.trim().isNotEmpty,
                     widget: CustomTextFormField(textController: ref.watch(createRoutineControllerProvider).titleController),
                   ),
                   const SizedBox(height: 30),
-                  ValidOrNotContainer(
+                  ValidationContainer(
                     title: 'Description',
                     isValid: ref.watch(createRoutineControllerProvider).descriptionController.text.trim().isNotEmpty,
                     widget: CustomTextFormField(textController: ref.watch(createRoutineControllerProvider).descriptionController),
                   ),
                   const SizedBox(height: 30),
-                  ValidOrNotContainer(
+                  ValidationContainer(
                     title: 'Starting from',
-                    isValid: ref.watch(createRoutineControllerProvider).startDateTime != null,
+                    isValid: ref.watch(createRoutineControllerProvider).nextDueDateTime != null,
                     widget: const StartTimePicker(),
                   ),
                   const SizedBox(height: 30),
-                  ValidOrNotContainer(
+                  ValidationContainer(
                     title: 'How often?',
                     isValid: ref.watch(createRoutineControllerProvider).dayFrequency != null,
                     widget: const DayFrequencySlider(),
                   ),
                   const SizedBox(height: 30),
-                  ValidOrNotContainer(
+                  ValidationContainer(
                       title: 'How hard is it?',
                       isValid: ref.watch(createRoutineControllerProvider).difficulty != null,
                       widget: const DifficultySlider()),
@@ -92,16 +78,13 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        backgroundColor: everythingOk ? Colors.blue : Colors.grey[600]!.withAlpha(150),
-        onPressed: everythingOk
+      floatingActionButton: FlatActionButton(
+        onTap: everythingOk
             ? () async {
                 await ref.read(createRoutineControllerProvider.notifier).createRoutine(ref);
                 if (mounted) Navigator.of(context).pop();
               }
             : null,
-        child: const Icon(Icons.add),
       ),
     );
   }

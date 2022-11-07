@@ -14,12 +14,12 @@ final createRoutineControllerProvider = StateNotifierProvider<CreateRoutineContr
     difficulty: null,
     dayFrequency: null,
     selectedCategory: '',
-    startDateTime: null,
+    nextDueDateTime: null,
     titleOk: false,
     descriptionOk: false,
     difficultyOk: false,
     dayFrequencyOk: false,
-    startDateTimeOk: false,
+    nextDueDateTimeOk: false,
     everythingOk: false,
   )),
 );
@@ -39,16 +39,16 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
     final titleOk = state.titleController.text.trim().isNotEmpty;
     final descriptionOk = state.descriptionController.text.trim().isNotEmpty;
     final dayFrequencyOk = state.dayFrequency != null;
-    final startDateTimeOk = state.startDateTime != null;
+    final nextDueDateTimeOk = state.nextDueDateTime != null;
     final difficultyOk = state.difficulty != null;
-    final everythingOk = (titleOk && descriptionOk && difficultyOk && dayFrequencyOk && startDateTimeOk);
+    final everythingOk = (titleOk && descriptionOk && difficultyOk && dayFrequencyOk && nextDueDateTimeOk);
 
     state = state.copyWith(
       titleOk: titleOk,
       descriptionOk: descriptionOk,
       difficultyOk: difficultyOk,
       dayFrequencyOk: dayFrequencyOk,
-      startDateTimeOk: startDateTimeOk,
+      nextDueDateTimeOk: nextDueDateTimeOk,
       everythingOk: everythingOk,
     );
   }
@@ -71,36 +71,51 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
     state = state.copyWith(dayFrequency: flooredFrequency);
   }
 
+  Future<bool> confirmCancelDraftDialog(BuildContext context) async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Draft will be deleted'),
+            content: const Text('Are you sure you want to go back to the homepage without adding the routine?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Yes, delete and go back')),
+              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('No, continue editing')),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   Future<void> createRoutine(WidgetRef ref) async {
     final title = state.titleController.text.trim();
     final description = state.descriptionController.text.trim();
     final difficulty = state.difficulty;
     final dayFrequency = state.dayFrequency;
-    final startDateTime = state.startDateTime;
+    final nextDueDateTime = state.nextDueDateTime;
 
     await DataBaseService.instance.createAndSaveRoutine(
       title,
       description,
       difficulty,
       dayFrequency,
-      startDateTime,
+      nextDueDateTime,
     );
 
     await ref.read(routinesController.notifier).updateRoutines();
   }
 
-  Future<void> pickStartDateTime(context) async {
+  Future<void> pickNextDueDateTime(context) async {
     final today = DateTime.now();
     final earliest = today.subtract(const Duration(days: 365));
     final latest = today.add(const Duration(days: 365));
 
-    final startDateTime = await showDatePicker(
+    final nextDueDateTime = await showDatePicker(
       context: context,
       initialDate: today,
       firstDate: earliest,
       lastDate: latest,
     );
 
-    state = state.copyWith(startDateTime: startDateTime);
+    state = state.copyWith(nextDueDateTime: nextDueDateTime);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ValidOrNotContainer extends StatelessWidget {
-  const ValidOrNotContainer({
+class ValidationContainer extends StatelessWidget {
+  const ValidationContainer({
     Key? key,
     required this.title,
     required this.isValid,

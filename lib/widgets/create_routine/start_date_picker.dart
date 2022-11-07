@@ -9,21 +9,21 @@ class StartTimePicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final startDateTime = ref.watch(createRoutineControllerProvider).startDateTime;
-    return (startDateTime == null)
+    final nextDueDateTime = ref.watch(createRoutineControllerProvider).nextDueDateTime;
+    return (nextDueDateTime == null)
         ? ElevatedButton(
             onPressed: () {
-              ref.read(createRoutineControllerProvider.notifier).pickStartDateTime(context);
+              ref.read(createRoutineControllerProvider.notifier).pickNextDueDateTime(context);
               ref.read(createRoutineControllerProvider.notifier).validateForm();
             },
             child: const Text('Select'),
           )
         : Column(
             children: [
-              Text('${startDateTime.day}.${startDateTime.month}.${startDateTime.year}'),
+              Text('${nextDueDateTime.day}.${nextDueDateTime.month}.${nextDueDateTime.year}'),
               ElevatedButton(
                 onPressed: () {
-                  ref.read(createRoutineControllerProvider.notifier).pickStartDateTime(context);
+                  ref.read(createRoutineControllerProvider.notifier).pickNextDueDateTime(context);
                   ref.read(createRoutineControllerProvider.notifier).validateForm();
                 },
                 child: const Text('Select another date'),

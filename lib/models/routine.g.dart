@@ -32,15 +32,15 @@ const RoutineSchema = CollectionSchema(
       name: r'difficulty',
       type: IsarType.long,
     ),
-    r'routineCompletedDateTimes': PropertySchema(
+    r'nextDueDateTime': PropertySchema(
       id: 3,
+      name: r'nextDueDateTime',
+      type: IsarType.dateTime,
+    ),
+    r'routineCompletedDateTimes': PropertySchema(
+      id: 4,
       name: r'routineCompletedDateTimes',
       type: IsarType.dateTimeList,
-    ),
-    r'startDateTime': PropertySchema(
-      id: 4,
-      name: r'startDateTime',
-      type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
       id: 5,
@@ -66,6 +66,19 @@ const RoutineSchema = CollectionSchema(
           caseSensitive: true,
         )
       ],
+    ),
+    r'nextDueDateTime': IndexSchema(
+      id: 5567806391310369886,
+      name: r'nextDueDateTime',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'nextDueDateTime',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
     )
   },
   links: {},
@@ -82,24 +95,9 @@ int _routineEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  {
-    final value = object.description;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  {
-    final value = object.routineCompletedDateTimes;
-    if (value != null) {
-      bytesCount += 3 + value.length * 8;
-    }
-  }
-  {
-    final value = object.title;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
+  bytesCount += 3 + object.description.length * 3;
+  bytesCount += 3 + object.routineCompletedDateTimes.length * 8;
+  bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
 
@@ -112,8 +110,8 @@ void _routineSerialize(
   writer.writeLong(offsets[0], object.dayFrequency);
   writer.writeString(offsets[1], object.description);
   writer.writeLong(offsets[2], object.difficulty);
-  writer.writeDateTimeList(offsets[3], object.routineCompletedDateTimes);
-  writer.writeDateTime(offsets[4], object.startDateTime);
+  writer.writeDateTime(offsets[3], object.nextDueDateTime);
+  writer.writeDateTimeList(offsets[4], object.routineCompletedDateTimes);
   writer.writeString(offsets[5], object.title);
 }
 
@@ -124,13 +122,13 @@ Routine _routineDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Routine();
-  object.dayFrequency = reader.readLongOrNull(offsets[0]);
-  object.description = reader.readStringOrNull(offsets[1]);
-  object.difficulty = reader.readLongOrNull(offsets[2]);
+  object.dayFrequency = reader.readLong(offsets[0]);
+  object.description = reader.readString(offsets[1]);
+  object.difficulty = reader.readLong(offsets[2]);
   object.id = id;
-  object.routineCompletedDateTimes = reader.readDateTimeList(offsets[3]);
-  object.startDateTime = reader.readDateTimeOrNull(offsets[4]);
-  object.title = reader.readStringOrNull(offsets[5]);
+  object.nextDueDateTime = reader.readDateTime(offsets[3]);
+  object.routineCompletedDateTimes = reader.readDateTimeList(offsets[4]) ?? [];
+  object.title = reader.readString(offsets[5]);
   return object;
 }
 
@@ -142,17 +140,17 @@ P _routineDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 3:
-      return (reader.readDateTimeList(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 4:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readDateTimeList(offset) ?? []) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -181,6 +179,14 @@ extension RoutineQueryWhereSort on QueryBuilder<Routine, Routine, QWhere> {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'title'),
+      );
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterWhere> anyNextDueDateTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'nextDueDateTime'),
       );
     });
   }
@@ -252,28 +258,7 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterWhereClause> titleIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'title',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterWhereClause> titleIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'title',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterWhereClause> titleEqualTo(
-      String? title) {
+  QueryBuilder<Routine, Routine, QAfterWhereClause> titleEqualTo(String title) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'title',
@@ -283,7 +268,7 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
   }
 
   QueryBuilder<Routine, Routine, QAfterWhereClause> titleNotEqualTo(
-      String? title) {
+      String title) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -318,7 +303,7 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
   }
 
   QueryBuilder<Routine, Routine, QAfterWhereClause> titleGreaterThan(
-    String? title, {
+    String title, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -332,7 +317,7 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
   }
 
   QueryBuilder<Routine, Routine, QAfterWhereClause> titleLessThan(
-    String? title, {
+    String title, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -346,8 +331,8 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
   }
 
   QueryBuilder<Routine, Routine, QAfterWhereClause> titleBetween(
-    String? lowerTitle,
-    String? upperTitle, {
+    String lowerTitle,
+    String upperTitle, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -407,29 +392,102 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
       }
     });
   }
+
+  QueryBuilder<Routine, Routine, QAfterWhereClause> nextDueDateTimeEqualTo(
+      DateTime nextDueDateTime) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'nextDueDateTime',
+        value: [nextDueDateTime],
+      ));
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterWhereClause> nextDueDateTimeNotEqualTo(
+      DateTime nextDueDateTime) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'nextDueDateTime',
+              lower: [],
+              upper: [nextDueDateTime],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'nextDueDateTime',
+              lower: [nextDueDateTime],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'nextDueDateTime',
+              lower: [nextDueDateTime],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'nextDueDateTime',
+              lower: [],
+              upper: [nextDueDateTime],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterWhereClause> nextDueDateTimeGreaterThan(
+    DateTime nextDueDateTime, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nextDueDateTime',
+        lower: [nextDueDateTime],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterWhereClause> nextDueDateTimeLessThan(
+    DateTime nextDueDateTime, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nextDueDateTime',
+        lower: [],
+        upper: [nextDueDateTime],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterWhereClause> nextDueDateTimeBetween(
+    DateTime lowerNextDueDateTime,
+    DateTime upperNextDueDateTime, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nextDueDateTime',
+        lower: [lowerNextDueDateTime],
+        includeLower: includeLower,
+        upper: [upperNextDueDateTime],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension RoutineQueryFilter
     on QueryBuilder<Routine, Routine, QFilterCondition> {
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> dayFrequencyIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'dayFrequency',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition>
-      dayFrequencyIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'dayFrequency',
-      ));
-    });
-  }
-
   QueryBuilder<Routine, Routine, QAfterFilterCondition> dayFrequencyEqualTo(
-      int? value) {
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'dayFrequency',
@@ -439,7 +497,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> dayFrequencyGreaterThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -452,7 +510,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> dayFrequencyLessThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -465,8 +523,8 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> dayFrequencyBetween(
-    int? lower,
-    int? upper, {
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -481,24 +539,8 @@ extension RoutineQueryFilter
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'description',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'description',
-      ));
-    });
-  }
-
   QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionEqualTo(
-    String? value, {
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -511,7 +553,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -526,7 +568,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -541,8 +583,8 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> descriptionBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -628,24 +670,8 @@ extension RoutineQueryFilter
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'difficulty',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'difficulty',
-      ));
-    });
-  }
-
   QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyEqualTo(
-      int? value) {
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'difficulty',
@@ -655,7 +681,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyGreaterThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -668,7 +694,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyLessThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -681,8 +707,8 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> difficultyBetween(
-    int? lower,
-    int? upper, {
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -749,20 +775,56 @@ extension RoutineQueryFilter
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition>
-      routineCompletedDateTimesIsNull() {
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> nextDueDateTimeEqualTo(
+      DateTime value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'routineCompletedDateTimes',
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'nextDueDateTime',
+        value: value,
       ));
     });
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition>
-      routineCompletedDateTimesIsNotNull() {
+      nextDueDateTimeGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'routineCompletedDateTimes',
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'nextDueDateTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> nextDueDateTimeLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'nextDueDateTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> nextDueDateTimeBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'nextDueDateTime',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -912,95 +974,8 @@ extension RoutineQueryFilter
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startDateTimeIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'startDateTime',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition>
-      startDateTimeIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'startDateTime',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startDateTimeEqualTo(
-      DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'startDateTime',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition>
-      startDateTimeGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'startDateTime',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startDateTimeLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'startDateTime',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startDateTimeBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'startDateTime',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> titleIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'title',
-      ));
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> titleIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'title',
-      ));
-    });
-  }
-
   QueryBuilder<Routine, Routine, QAfterFilterCondition> titleEqualTo(
-    String? value, {
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1013,7 +988,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> titleGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1028,7 +1003,7 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> titleLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1043,8 +1018,8 @@ extension RoutineQueryFilter
   }
 
   QueryBuilder<Routine, Routine, QAfterFilterCondition> titleBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1173,15 +1148,15 @@ extension RoutineQuerySortBy on QueryBuilder<Routine, Routine, QSortBy> {
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartDateTime() {
+  QueryBuilder<Routine, Routine, QAfterSortBy> sortByNextDueDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'startDateTime', Sort.asc);
+      return query.addSortBy(r'nextDueDateTime', Sort.asc);
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartDateTimeDesc() {
+  QueryBuilder<Routine, Routine, QAfterSortBy> sortByNextDueDateTimeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'startDateTime', Sort.desc);
+      return query.addSortBy(r'nextDueDateTime', Sort.desc);
     });
   }
 
@@ -1248,15 +1223,15 @@ extension RoutineQuerySortThenBy
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartDateTime() {
+  QueryBuilder<Routine, Routine, QAfterSortBy> thenByNextDueDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'startDateTime', Sort.asc);
+      return query.addSortBy(r'nextDueDateTime', Sort.asc);
     });
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartDateTimeDesc() {
+  QueryBuilder<Routine, Routine, QAfterSortBy> thenByNextDueDateTimeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'startDateTime', Sort.desc);
+      return query.addSortBy(r'nextDueDateTime', Sort.desc);
     });
   }
 
@@ -1294,16 +1269,16 @@ extension RoutineQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Routine, Routine, QDistinct> distinctByNextDueDateTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'nextDueDateTime');
+    });
+  }
+
   QueryBuilder<Routine, Routine, QDistinct>
       distinctByRoutineCompletedDateTimes() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'routineCompletedDateTimes');
-    });
-  }
-
-  QueryBuilder<Routine, Routine, QDistinct> distinctByStartDateTime() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'startDateTime');
     });
   }
 
@@ -1323,38 +1298,38 @@ extension RoutineQueryProperty
     });
   }
 
-  QueryBuilder<Routine, int?, QQueryOperations> dayFrequencyProperty() {
+  QueryBuilder<Routine, int, QQueryOperations> dayFrequencyProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'dayFrequency');
     });
   }
 
-  QueryBuilder<Routine, String?, QQueryOperations> descriptionProperty() {
+  QueryBuilder<Routine, String, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
     });
   }
 
-  QueryBuilder<Routine, int?, QQueryOperations> difficultyProperty() {
+  QueryBuilder<Routine, int, QQueryOperations> difficultyProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'difficulty');
     });
   }
 
-  QueryBuilder<Routine, List<DateTime>?, QQueryOperations>
+  QueryBuilder<Routine, DateTime, QQueryOperations> nextDueDateTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'nextDueDateTime');
+    });
+  }
+
+  QueryBuilder<Routine, List<DateTime>, QQueryOperations>
       routineCompletedDateTimesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'routineCompletedDateTimes');
     });
   }
 
-  QueryBuilder<Routine, DateTime?, QQueryOperations> startDateTimeProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'startDateTime');
-    });
-  }
-
-  QueryBuilder<Routine, String?, QQueryOperations> titleProperty() {
+  QueryBuilder<Routine, String, QQueryOperations> titleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'title');
     });

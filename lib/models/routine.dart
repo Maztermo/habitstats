@@ -7,15 +7,15 @@ class Routine {
   Id id = Isar.autoIncrement;
 
   @Index(type: IndexType.value)
-  String? title;
-  String? description;
+  late String title;
+  late String description;
 
-  int? difficulty;
-  int? dayFrequency;
+  late int difficulty;
+  late int dayFrequency;
 
-  DateTime? startDateTime;
-
-  List<DateTime>? routineCompletedDateTimes;
+  @Index(type: IndexType.value)
+  late DateTime nextDueDateTime;
+  late List<DateTime> routineCompletedDateTimes;
 
   //String category;
   //late DateTime lastDateTime;
