@@ -11,15 +11,12 @@ final createRoutineControllerProvider = StateNotifierProvider<CreateRoutineContr
     formKey: GlobalKey<FormState>(),
     titleController: TextEditingController(),
     descriptionController: TextEditingController(),
-    difficulty: null,
-    dayFrequency: null,
+    difficulty: 1,
+    dayFrequency: 1,
     selectedCategory: '',
-    nextDueDateTime: null,
+    nextDueDateTime: DateTime.now(),
     titleOk: false,
     descriptionOk: false,
-    difficultyOk: false,
-    dayFrequencyOk: false,
-    nextDueDateTimeOk: false,
     everythingOk: false,
   )),
 );
@@ -38,17 +35,11 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
   validateForm() {
     final titleOk = state.titleController.text.trim().isNotEmpty;
     final descriptionOk = state.descriptionController.text.trim().isNotEmpty;
-    final dayFrequencyOk = state.dayFrequency != null;
-    final nextDueDateTimeOk = state.nextDueDateTime != null;
-    final difficultyOk = state.difficulty != null;
-    final everythingOk = (titleOk && descriptionOk && difficultyOk && dayFrequencyOk && nextDueDateTimeOk);
+    final everythingOk = (titleOk && descriptionOk);
 
     state = state.copyWith(
       titleOk: titleOk,
       descriptionOk: descriptionOk,
-      difficultyOk: difficultyOk,
-      dayFrequencyOk: dayFrequencyOk,
-      nextDueDateTimeOk: nextDueDateTimeOk,
       everythingOk: everythingOk,
     );
   }

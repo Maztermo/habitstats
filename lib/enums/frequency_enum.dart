@@ -1,4 +1,4 @@
-enum HowOften {
+enum FrequencyEnum {
   everyday,
   everySecondDay,
   everyWeek,

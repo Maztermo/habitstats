@@ -39,7 +39,8 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
           },
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            child: Padding(
+            child: Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(32.0),
               child: Column(
                 children: [

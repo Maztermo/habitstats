@@ -6,13 +6,16 @@
 /* -------------------------------------------------------------------------- */
 
 
+/* -------------------- Postponed to offset feature creep ------------------- */
+// POSTPONED: Make the routine.nextDueDateTime appear in the app calendar
+// POSTPONED: Make the routine.dayFrequency put new dots on the app calendar
+
 
 /* ---------------------------------- TODOs --------------------------------- */
 
 
 
-// TODO: Make the routine.nextDueDateTime appear in the app calendar
-// TODO: Make the routine.dayFrequency put new dots on the app calendar
+
 // TODO: Think about having a resetDayFrequencyWhenDoneBeforeOrAfterDate.
 // TODO: Look into improving & simplifying the Create a routine process. 
 // I.e by having some fields already selected / populated. 

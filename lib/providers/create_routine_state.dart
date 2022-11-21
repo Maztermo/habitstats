@@ -6,16 +6,13 @@ class CreateRoutineState extends Equatable {
   final GlobalKey<FormState> formKey;
   final TextEditingController titleController;
   final TextEditingController descriptionController;
-  final int? difficulty; // starts as null
-  final int? dayFrequency;
+  final int difficulty; // starts as null
+  final int dayFrequency;
   final String selectedCategory;
-  final DateTime? nextDueDateTime; // starts as null
+  final DateTime nextDueDateTime; // starts as null
   // bools
   final bool titleOk;
   final bool descriptionOk;
-  final bool difficultyOk;
-  final bool dayFrequencyOk;
-  final bool nextDueDateTimeOk;
   final bool everythingOk;
 
   const CreateRoutineState({
@@ -29,9 +26,6 @@ class CreateRoutineState extends Equatable {
     // bools
     required this.titleOk,
     required this.descriptionOk,
-    required this.difficultyOk,
-    required this.dayFrequencyOk,
-    required this.nextDueDateTimeOk,
     required this.everythingOk,
   });
 
@@ -62,9 +56,6 @@ class CreateRoutineState extends Equatable {
         // bools
         titleOk: titleOk ?? this.titleOk,
         descriptionOk: descriptionOk ?? this.descriptionOk,
-        difficultyOk: difficultyOk ?? this.difficultyOk,
-        dayFrequencyOk: dayFrequencyOk ?? this.dayFrequencyOk,
-        nextDueDateTimeOk: nextDueDateTimeOk ?? this.nextDueDateTimeOk,
         everythingOk: everythingOk ?? this.everythingOk,
       );
 
@@ -80,9 +71,6 @@ class CreateRoutineState extends Equatable {
         // bools
         titleOk,
         descriptionOk,
-        difficultyOk,
-        dayFrequencyOk,
-        nextDueDateTimeOk,
         everythingOk,
       ];
 }

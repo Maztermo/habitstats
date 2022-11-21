@@ -86,7 +86,7 @@ const RoutineSchema = CollectionSchema(
   getId: _routineGetId,
   getLinks: _routineGetLinks,
   attach: _routineAttach,
-  version: '3.0.2',
+  version: '3.0.5',
 );
 
 int _routineEstimateSize(
