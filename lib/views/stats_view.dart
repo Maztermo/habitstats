@@ -19,6 +19,25 @@ class StatsView extends ConsumerWidget {
           'Some other stat: ${routines.length}',
           style: Theme.of(context).textTheme.headline4,
         ),
+        Row(
+          children: [
+            Container(
+              color: Theme.of(context).colorScheme.primary,
+              height: 20,
+              width: 20,
+            ),
+            Container(
+              color: Theme.of(context).colorScheme.secondary,
+              height: 20,
+              width: 20,
+            ),
+            Container(
+              color: Theme.of(context).colorScheme.tertiary,
+              height: 20,
+              width: 20,
+            ),
+          ],
+        ),
       ],
     );
   }

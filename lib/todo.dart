@@ -12,13 +12,13 @@
 
 
 /* ---------------------------------- TODOs --------------------------------- */
-
-
-
+// ONGOING: Working on theme, playing around with material 3 stuffs. 
 
 // TODO: Think about having a resetDayFrequencyWhenDoneBeforeOrAfterDate.
-// TODO: Look into improving & simplifying the Create a routine process. 
-// I.e by having some fields already selected / populated. 
+
+
+
+
 
 
 
@@ -30,6 +30,12 @@
 /// This is mainly nice to have as a reminder to myself of all the work I've 
 /// put in, as it often times wont be very visible by just looking at commits
 /// or the code itself.
+
+
+// DONE: Implemented a reset createRoutineController function for onWillPop.
+
+// DONE: Simplified the Create a routine process by having some fields already
+// selected / populated.
 
 // DONE: Added an index for Routine model on nextDueDateTime and sorted
 // based on that property in the upcoming_view. Impressed with how easy 

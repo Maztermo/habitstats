@@ -13,18 +13,23 @@ class UpcomingView extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Motivational words here',
+            'Your Upcoming Tasks',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
+          const SizedBox(height: 8),
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
               itemCount: routines.length,
               itemBuilder: ((context, index) {
                 final routine = routines[index];
-                return RoutineTile(routine: routine);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: RoutineTile(routine: routine),
+                );
               }),
             ),
           ),

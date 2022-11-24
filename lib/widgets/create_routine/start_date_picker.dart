@@ -12,16 +12,27 @@ class StartTimePicker extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nextDueDateTime = ref.watch(createRoutineControllerProvider).nextDueDateTime;
     final dateFormatted = '${nextDueDateTime.day}.${nextDueDateTime.month}.${nextDueDateTime.year}';
-    return Column(
+    return Row(
       children: [
-        Text(nextDueDateTime.isToday ? 'Today' : dateFormatted),
-        ElevatedButton(
+        Text(
+          'Start date: ',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const Spacer(),
+        Text(
+          nextDueDateTime.isToday ? 'Today' : dateFormatted,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
+        ),
+        IconButton(
           onPressed: () {
             ref.read(createRoutineControllerProvider.notifier).pickNextDueDateTime(context);
             ref.read(createRoutineControllerProvider.notifier).validateForm();
           },
-          child: const Text('Select another date'),
-        )
+          icon: Icon(
+            Icons.edit,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitstats/constants/navigation_routes.dart';
 import 'package:habitstats/services/db_service.dart';
 import 'package:habitstats/services/shared_preferences_service.dart';
+import 'package:habitstats/themes.dart';
 import 'package:habitstats/views/home_view.dart';
 
 void main() async {
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Habit Stats',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: darkTheme,
       home: const HomeView(),
       routes: navigationRoutes,
     );

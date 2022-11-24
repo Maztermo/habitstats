@@ -16,6 +16,21 @@ extension FrequencyEnumExtension on FrequencyEnum {
     }
   }
 
+  String get uiText {
+    switch (this) {
+      case FrequencyEnum.everyday:
+        return 'Every Day';
+      case FrequencyEnum.everySecondDay:
+        return 'Every Second Day';
+      case FrequencyEnum.everyWeek:
+        return 'Every Week';
+      case FrequencyEnum.everySecondWeek:
+        return 'Every Second Week';
+      case FrequencyEnum.everyFourthWeek:
+        return 'Every Fourth Week';
+    }
+  }
+
   FrequencyEnum getFromDayFrequency(int dayFrequency) {
     switch (dayFrequency) {
       case 1:

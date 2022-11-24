@@ -22,4 +22,19 @@ extension DifficultyEnumExtension on DifficultyEnum {
         return DifficultyEnum.easy;
     }
   }
+
+  String get uiText {
+    switch (this) {
+      case DifficultyEnum.easy:
+        return 'Easy';
+      case DifficultyEnum.lightWork:
+        return 'Light Work';
+      case DifficultyEnum.medium:
+        return 'Medium';
+      case DifficultyEnum.prettyHard:
+        return 'Pretty Hard';
+      case DifficultyEnum.hard:
+        return 'Hard';
+    }
+  }
 }

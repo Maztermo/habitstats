@@ -62,8 +62,12 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
     state = state.copyWith(dayFrequency: flooredFrequency);
   }
 
-  Future<bool> confirmCancelDraftDialog(BuildContext context) async {
-    return await showDialog(
+  Future<bool> confirmOrCancelDraftDialog(BuildContext context) async {
+    if (state.titleController.text.isEmpty && state.descriptionController.text.isEmpty) {
+      return true;
+    }
+
+    final reset = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Draft will be deleted'),
@@ -75,6 +79,23 @@ class CreateRoutineController extends StateNotifier<CreateRoutineState> {
           ),
         ) ??
         false;
+
+    if (reset) resetCreateRoutineController();
+    return reset;
+  }
+
+  resetCreateRoutineController() {
+    state.titleController.clear();
+    state.descriptionController.clear();
+    state = state.copyWith(
+      difficulty: 1,
+      dayFrequency: 1,
+      selectedCategory: '',
+      nextDueDateTime: DateTime.now(),
+      titleOk: false,
+      descriptionOk: false,
+      everythingOk: false,
+    );
   }
 
   Future<void> createRoutine(WidgetRef ref) async {

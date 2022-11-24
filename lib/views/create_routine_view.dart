@@ -5,7 +5,6 @@ import 'package:habitstats/widgets/create_routine/custom_text_form_field.dart';
 import 'package:habitstats/widgets/create_routine/day_frequency_slider.dart';
 import 'package:habitstats/widgets/create_routine/difficulty_slider.dart';
 import 'package:habitstats/widgets/create_routine/start_date_picker.dart';
-import 'package:habitstats/widgets/create_routine/validation_container.dart';
 import 'package:habitstats/widgets/flat_action_button.dart';
 
 class CreateRoutineView extends ConsumerStatefulWidget {
@@ -24,11 +23,13 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
     final everythingOk = ref.watch(createRoutineControllerProvider).everythingOk;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: const Text('Create new routine')),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('register your new routine'),
+      ),
       body: Form(
         key: formKey,
-        onWillPop: () => ref.read(createRoutineControllerProvider.notifier).confirmCancelDraftDialog(context),
+        onWillPop: () => ref.read(createRoutineControllerProvider.notifier).confirmOrCancelDraftDialog(context),
         child: GestureDetector(
           onTap: () {
             // Detect tap outside of primaryFocus => dismiss keyboard
@@ -37,49 +38,31 @@ class _CreateRoutineViewState extends ConsumerState<CreateRoutineView> {
               currentFocus.unfocus();
             }
           },
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                children: [
-                  ValidationContainer(
-                    title: 'Title',
-                    isValid: ref.watch(createRoutineControllerProvider).titleController.text.trim().isNotEmpty,
-                    widget: CustomTextFormField(textController: ref.watch(createRoutineControllerProvider).titleController),
-                  ),
-                  const SizedBox(height: 30),
-                  ValidationContainer(
-                    title: 'Description',
-                    isValid: ref.watch(createRoutineControllerProvider).descriptionController.text.trim().isNotEmpty,
-                    widget: CustomTextFormField(textController: ref.watch(createRoutineControllerProvider).descriptionController),
-                  ),
-                  const SizedBox(height: 30),
-                  ValidationContainer(
-                    title: 'Starting from',
-                    isValid: ref.watch(createRoutineControllerProvider).nextDueDateTime != null,
-                    widget: const StartTimePicker(),
-                  ),
-                  const SizedBox(height: 30),
-                  ValidationContainer(
-                    title: 'How often?',
-                    isValid: ref.watch(createRoutineControllerProvider).dayFrequency != null,
-                    widget: const DayFrequencySlider(),
-                  ),
-                  const SizedBox(height: 30),
-                  ValidationContainer(
-                      title: 'How hard is it?',
-                      isValid: ref.watch(createRoutineControllerProvider).difficulty != null,
-                      widget: const DifficultySlider()),
-                  const SizedBox(height: 30),
-                ],
-              ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(48.0),
+            child: Column(
+              children: [
+                CustomTextFormFieldRow(
+                  title: 'Title',
+                  textController: ref.watch(createRoutineControllerProvider).titleController,
+                ),
+                const SizedBox(height: 16),
+                CustomTextFormFieldRow(
+                  title: 'Description',
+                  textController: ref.watch(createRoutineControllerProvider).descriptionController,
+                ),
+                const SizedBox(height: 16),
+                const DayFrequencySlider(),
+                const DifficultySlider(),
+                const StartTimePicker(),
+              ],
             ),
           ),
         ),
       ),
       floatingActionButton: FlatActionButton(
+        iconData: Icons.done,
         onTap: everythingOk
             ? () async {
                 await ref.read(createRoutineControllerProvider.notifier).createRoutine(ref);

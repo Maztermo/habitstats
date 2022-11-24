@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habitstats/providers/home_page_controller.dart';
-import 'package:habitstats/providers/routines_controller.dart';
 import 'package:habitstats/views/calendar_view.dart';
 import 'package:habitstats/views/create_routine_view.dart';
 import 'package:habitstats/views/stats_view.dart';
@@ -15,18 +14,7 @@ class HomeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Yo I'm the AppBar"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pushNamed(CreateRoutineView.routeId),
-            child: Text(
-              'Create new routine',
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-            ),
-          )
-        ],
-      ),
+      appBar: AppBar(),
       body: PageView(
         physics: const BouncingScrollPhysics(),
         onPageChanged: ref.read(homePageControllerProvider.notifier).makeSureNavBarIndexIsUpdated,
@@ -38,7 +26,7 @@ class HomeView extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: const BottomNavBar(),
-      floatingActionButton: FlatActionButton(onTap: ref.read(routinesController.notifier).deleteFirstTask),
+      floatingActionButton: FlatActionButton(iconData: Icons.add, onTap: () => Navigator.of(context).pushNamed(CreateRoutineView.routeId)),
     );
   }
 }
